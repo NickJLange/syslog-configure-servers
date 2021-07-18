@@ -1,0 +1,5 @@
+---
+- name: reload rsyslog
+  become: yes
+  become_user: root
+  command: systemctl restart rsyslog.service

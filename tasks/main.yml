@@ -1,0 +1,10 @@
+---
+
+- import_tasks: configure.yml
+
+  tags: [syslog_configure]
+
+
+
+#- import_tasks: configure_client_interface.yml
+#  tags: [wireguard_configure_client]
