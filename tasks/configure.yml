@@ -1,0 +1,40 @@
+---
+###############################################################################
+################################# INSTALL #####################################
+###############################################################################
+
+- stat:
+    path: "{{ rsyslog_prefix }}"
+  register: installed_ok
+  tags:
+    - rsyslog_systemd
+
+
+
+###############################################################################
+################################ CONFIGURE ####################################
+###############################################################################
+
+- block:
+
+  - name: Add default config
+    template:
+      src: remote-syslog.conf.j2
+      dest: "{{rsyslog_prefix}}/remote-syslog.conf"
+      mode: 0644
+      owner: "root"
+      group: "root"
+    notify: reload rsyslog
+
+- name: Creates a cron file  to rotate logs
+  cron:
+    name: Clear journald logs
+    minute: 0
+    hour: 0
+    user:  "root"
+    job: "/bin/journalctl --vacuum-time={{systemd_max_retention_time}}"
+#    cron_file: phoneHome_sh
+
+  become: yes
+  become_user: "root"
+  tags: mqtt_systemd

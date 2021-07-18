@@ -1,0 +1,5 @@
+---
+
+rsyslog_prefix: "/etc/rsyslog.d/"
+systemd_max_retention_time: "3d"
+systemd_max_retention_size: "500M"
