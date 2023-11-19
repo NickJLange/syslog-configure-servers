@@ -16,25 +16,43 @@
 ###############################################################################
 
 - block:
+  # disable for now
+  - name: Add default config
+#    template:
+#      src: remote-syslog.conf.j2
+    file:
+      path: "{{rsyslog_prefix}}/remote-syslog.conf"
+      mode: 0644
+      state: absent
+      owner: "root"
+      group: "root"
+    notify: reload rsyslog
 
   - name: Add default config
     template:
-      src: remote-syslog.conf.j2
-      dest: "{{rsyslog_prefix}}/remote-syslog.conf"
+      src: datadog.conf.j2
+      dest: "{{rsyslog_prefix}}/datadog.conf"
       mode: 0644
       owner: "root"
       group: "root"
     notify: reload rsyslog
 
-- name: Creates a cron file  to rotate logs
-  cron:
-    name: Clear journald logs
-    minute: 0
-    hour: 0
-    user:  "root"
-    job: "/bin/journalctl --vacuum-time={{systemd_max_retention_time}}"
-#    cron_file: phoneHome_sh
+  - name: Add default config
+    template:
+      src: logrotate-syslog.conf.j2
+      dest: "/etc/logrotate.d/rsyslog"
+      mode: 0644
+      owner: "root"
+      group: "root"
+    notify: relogrotate
 
+  - name: Creates a cron file  to rotate logs
+    cron:
+      name: Clear journald logs
+      minute: 0
+      hour: 0
+      user:  "root"
+      job: "/bin/journalctl --vacuum-time={{systemd_max_retention_time}}"
   become: yes
   become_user: "root"
   tags: mqtt_systemd

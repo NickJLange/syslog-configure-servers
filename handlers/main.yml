@@ -2,4 +2,11 @@
 - name: reload rsyslog
   become: yes
   become_user: root
-  command: systemctl restart rsyslog.service
+  command: systemctl restart rsyslog
+  
+- name: relogrotate
+  become: yes
+  become_user: root
+  command: systemctl restart logrotate.timer
+  
+  

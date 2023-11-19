@@ -1,0 +1,8 @@
+---
+    - name: Install requisite packages (likely present)
+      apt:
+        name:
+          - rsyslog-gnutls
+        state: present
+        force_apt_get: yes
+        cache_valid_time: 84600
