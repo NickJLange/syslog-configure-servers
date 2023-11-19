@@ -1,0 +1,8 @@
+module(load="imfile" PollingInterval="10")
+
+## Set the Datadog Format to send the logs
+$template DatadogFormat,"{{ my_datadog_api_key }} <%pri%>%protocol-version% %timestamp:::date-rfc3339% %HOSTNAME% %app-name% - - - %msg%\n"
+
+$DefaultNetstreamDriverCAFile /etc/ssl/certs/ca-certificates.crt
+
+*.*  action(type="omfwd" protocol="tcp" target="intake.logs.datadoghq.com" port="10516" template="DatadogFormat" StreamDriver="gtls" StreamDriverMode="1" StreamDriverAuthMode="x509/name" StreamDriverPermittedPeers="*.logs.datadoghq.com" )

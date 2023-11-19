@@ -1,4 +1,7 @@
 ---
+- import_tasks: install.yml
+
+  tags: [syslog_configure]
 
 - import_tasks: configure.yml
 
