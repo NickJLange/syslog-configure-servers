@@ -1,11 +1,10 @@
 ---
-
 dependencies: []
 
 galaxy_info:
   author: Nick Lange
   company: Private
-  description: Configures Raspberry PI Mosquitto Systemd
+  description: Configures PKI on various endpoints
   license: MIT
   min_ansible_version: 2.8
   platforms:

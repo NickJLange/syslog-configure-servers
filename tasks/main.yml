@@ -1,13 +1,9 @@
----
-- import_tasks: install.yml
+- name: Call install_certs_remote.yml
+  include_tasks: install_certs_remote.yml
+  tags: install_certs_remote
+  when: install_certs_remote is defined
 
-  tags: [syslog_configure]
-
-- import_tasks: configure.yml
-
-  tags: [syslog_configure]
-
-
-
-#- import_tasks: configure_client_interface.yml
-#  tags: [wireguard_configure_client]
+- name: Call install_certs_vault.yml
+  include_tasks: install_certs_vault.yml
+  tags: install_certs_vault
+  when: install_certs_vault is defined

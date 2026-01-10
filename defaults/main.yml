@@ -1,5 +1,6 @@
 ---
-
-rsyslog_prefix: "/etc/rsyslog.d/"
-systemd_max_retention_time: "3d"
-systemd_max_retention_size: "500M"
+ssl_cert_dir: "/etc/letsencrypt/"
+ssl_backup_dir: "{{ ssl_cert_dir }}/backup/"
+vault_cert_user: "letsencrypt"
+#local_venv_overlord_python_interpreter: "/usr/bin/python3"
+vault_cert_algo: "ec256"
