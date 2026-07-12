@@ -1,6 +1,6 @@
 ---
-ssl_cert_dir: "/etc/letsencrypt/"
-ssl_backup_dir: "{{ ssl_cert_dir }}/backup/"
+ssl_cert_dir: "/etc/letsencrypt"
+ssl_backup_dir: "{{ ssl_cert_dir }}/backup"
 vault_cert_user: "letsencrypt"
-#local_venv_overlord_python_interpreter: "/usr/bin/python3"
 vault_cert_algo: "ec256"
+cert_mgmt_venv_path: "{{ lookup('env', 'VENV_PATH') | default(playbook_dir + '/../../venv', true) }}"

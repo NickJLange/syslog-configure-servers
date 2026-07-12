@@ -1,0 +1,85 @@
+---
+- name: Assert cert_source_dir is provided
+  assert:
+    that: cert_source_dir is defined
+    fail_msg: "cert_source_dir must be passed as an extra variable (-e cert_source_dir=...)"
+
+- name: Determine source cert prefix (wildcard vs bare)
+  stat:
+    path: "{{ cert_source_dir }}/_.{{ subdomain }}.crt"
+  delegate_to: localhost
+  become: false
+  register: wildcard_stat
+
+- name: Set cert prefix
+  set_fact:
+    preamble: "{{ '_.' if wildcard_stat.stat.exists else '' }}"
+
+- name: Check cert directory exists
+  file:
+    path: "{{ ssl_cert_dir }}"
+    state: directory
+    mode: "0755"
+    owner: root
+    group: root
+  become: true
+
+- name: Check backup directory exists
+  file:
+    path: "{{ ssl_backup_dir }}"
+    state: directory
+    mode: "0755"
+    owner: root
+    group: root
+  become: true
+
+- name: Backup existing certs
+  shell: "mv -f {{ ssl_cert_dir }}/*.crt {{ ssl_cert_dir }}/*.key {{ ssl_backup_dir }}/"
+  ignore_errors: true
+  become: true
+
+- name: Copy certificate from local files
+  copy:
+    src: "{{ cert_source_dir }}/{{ preamble }}{{ subdomain }}.crt"
+    dest: "{{ ssl_cert_dir }}/{{ subdomain }}.crt"
+    owner: root
+    group: root
+    mode: "0644"
+  become: true
+
+- name: Copy private key from local files
+  copy:
+    src: "{{ cert_source_dir }}/{{ preamble }}{{ subdomain }}.key"
+    dest: "{{ ssl_cert_dir }}/{{ subdomain }}.key"
+    owner: root
+    group: root
+    mode: "0644"
+  become: true
+
+- name: Symlink server.cert
+  file:
+    src: "{{ subdomain }}.crt"
+    dest: "{{ ssl_cert_dir }}/server.cert"
+    force: yes
+    state: link
+  become: true
+
+- name: Symlink server.key
+  file:
+    src: "{{ subdomain }}.key"
+    dest: "{{ ssl_cert_dir }}/server.key"
+    force: yes
+    state: link
+  become: true
+
+- name: Signal Vault container to reload TLS certs
+  shell: sudo -u vault podman kill --signal HUP vault
+  args:
+    chdir: /tmp
+  become: true
+  ignore_errors: true
+  register: vault_hup_result
+
+- name: Report Vault reload outcome
+  debug:
+    msg: "{{ 'Vault HUP sent successfully' if vault_hup_result.rc == 0 else 'Vault HUP failed (rc=' + vault_hup_result.rc | string + ') — manual reload may be required' }}"

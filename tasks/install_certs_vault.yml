@@ -1,8 +1,4 @@
 ---
-- name: "Install hvac within a home directory (instead of venv madness...)"
-  ansible.builtin.pip:
-    name: hvac
-    extra_args: --user
 - name: Set Fact
   set_fact:
     subdomain: "{{ inventory_hostname.split('.')[1:] | join('.') }}"
@@ -14,20 +10,16 @@
 ### Default to wildcart path
 - name: Check if file exists
   stat:
-    path: "../roles/internal_dns_vault/files/certificates/{{ subdomain }}/{{ vault_cert_algo }}/_.{{ subdomain }}.crt"
+    path: "{{ role_path }}/files/certificates/{{ subdomain }}/{{ vault_cert_algo }}/_.{{ subdomain }}.crt"
   register: file_stat
 
 - name: Set variable based on file existence
   set_fact:
     preamble: "{{ '_.' if file_stat.stat.exists else '' }}"
 
-- name: Find out playbook's path
-  shell: pwd
-  register: playbook_path_output
-- debug: var=playbook_path_output.stdout
 - name: Read certificate from disk
   slurp:
-    src: "../roles/internal_dns_vault/files/certificates/{{ subdomain }}/{{ vault_cert_algo }}/{{ preamble }}{{ subdomain }}.crt"
+    src: "{{ role_path }}/files/certificates/{{ subdomain }}/{{ vault_cert_algo }}/{{ preamble }}{{ subdomain }}.crt"
   register: cert_content
 
 - name: Convert certificate content to string
@@ -35,7 +27,7 @@
     crt_string: "{{ cert_content['content'] | b64decode }}"
 - name: Read key from disk
   slurp:
-    src: "../roles/internal_dns_vault/files/certificates/{{ subdomain }}/{{ vault_cert_algo }}/{{ preamble }}{{ subdomain }}.key"
+    src: "{{ role_path }}/files/certificates/{{ subdomain }}/{{ vault_cert_algo }}/{{ preamble }}{{ subdomain }}.key"
   register: key_content
 
 - name: Convert certificate content to string
@@ -54,3 +46,5 @@
     data:
       key: "{{ key_string }}"
       crt: "{{ crt_string }}"
+ # vars:
+ #   ansible_python_interpreter: "{{ cert_mgmt_venv_path }}/bin/python3"
