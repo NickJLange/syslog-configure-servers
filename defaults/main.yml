@@ -1,6 +1,8 @@
 ---
 ssl_cert_dir: "/etc/letsencrypt"
 ssl_backup_dir: "{{ ssl_cert_dir }}/backup"
+# Owner of ssl_cert_dir and installed certs; created by mkrasberry roles/cert-setup.
+cert_owner: certpush
 vault_cert_user: "letsencrypt"
 vault_cert_algo: "ec256"
 cert_mgmt_venv_path: "{{ lookup('env', 'VENV_PATH') | default(playbook_dir + '/../.venv', true) }}"

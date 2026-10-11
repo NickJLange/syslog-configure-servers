@@ -20,8 +20,8 @@
     path: "{{ ssl_cert_dir }}"
     state: directory
     mode: "0755"
-    owner: root
-    group: root
+    owner: "{{ cert_owner }}"
+    group: "{{ cert_owner }}"
   become: true
 
 - name: Check backup directory exists
@@ -29,8 +29,8 @@
     path: "{{ ssl_backup_dir }}"
     state: directory
     mode: "0755"
-    owner: root
-    group: root
+    owner: "{{ cert_owner }}"
+    group: "{{ cert_owner }}"
   become: true
 
 - name: Backup existing certs
@@ -42,8 +42,8 @@
   copy:
     src: "{{ cert_source_dir }}/{{ preamble }}{{ subdomain }}.crt"
     dest: "{{ ssl_cert_dir }}/{{ subdomain }}.crt"
-    owner: root
-    group: root
+    owner: "{{ cert_owner }}"
+    group: "{{ cert_owner }}"
     mode: "0644"
   become: true
 
@@ -51,8 +51,8 @@
   copy:
     src: "{{ cert_source_dir }}/{{ preamble }}{{ subdomain }}.key"
     dest: "{{ ssl_cert_dir }}/{{ subdomain }}.key"
-    owner: root
-    group: root
+    owner: "{{ cert_owner }}"
+    group: "{{ cert_owner }}"
     mode: "0644"
   become: true
 

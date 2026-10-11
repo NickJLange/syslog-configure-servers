@@ -26,15 +26,15 @@
         path: "{{ ssl_cert_dir }}"
         state: directory
         mode: 0755
-        owner: root
-        group: root
+        owner: "{{ cert_owner }}"
+        group: "{{ cert_owner }}"
     - name: Check directory exists
       file:
         path: "{{ ssl_backup_dir }}"
         state: directory
         mode: 0755
-        owner: root
-        group: root
+        owner: "{{ cert_owner }}"
+        group: "{{ cert_owner }}"
 
     - name: Backup certs to directory
       shell: "mv -f {{ ssl_cert_dir }}/*.crt {{ ssl_cert_dir }}/*.key {{ ssl_backup_dir }}"
@@ -44,8 +44,8 @@
       copy:
         content: "{{ vault_secret.data.data.crt}}"
         dest: "{{ ssl_cert_dir }}/{{ item }}"
-        owner: root
-        group: root
+        owner: "{{ cert_owner }}"
+        group: "{{ cert_owner }}"
         mode: 0644
       loop:
         - "{{ subdomain }}.crt"
@@ -55,8 +55,8 @@
       copy:
         content: "{{ vault_secret.data.data.key}}"
         dest: "{{ ssl_cert_dir }}/{{ item }}"
-        owner: root
-        group: root
+        owner: "{{ cert_owner }}"
+        group: "{{ cert_owner }}"
         mode: 0644
       loop:
         - "{{ subdomain }}.key"
@@ -84,4 +84,6 @@
         - "{{ subdomain }}.key"
         #      - "unifi-core-direct.key"
 
-  become: true
+  # cert_owner (certpush, see mkrasberry roles/cert-setup) owns ssl_cert_dir,
+  # so the push needs no sudo.
+  become: false
