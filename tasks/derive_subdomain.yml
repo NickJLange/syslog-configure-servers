@@ -1,0 +1,29 @@
+---
+- name: Assert dns_sites is defined if subdomain is not provided
+  assert:
+    that:
+      - dns_sites is defined
+    fail_msg: >
+      Neither 'subdomain' nor 'dns_sites' is defined for host '{{ inventory_hostname }}'.
+      Pass -e subdomain=<site>.nicklange.family explicitly, or define 'dns_sites' in inventory group_vars.
+  when: subdomain is not defined
+
+- name: Determine site from inventory group membership
+  set_fact:
+    site_matches: "{{ group_names | intersect(dns_sites) }}"
+  when: subdomain is not defined
+
+- name: Assert host belongs to exactly one site group
+  assert:
+    that:
+      - site_matches | length == 1
+    fail_msg: >
+      Host {{ inventory_hostname }} must belong to exactly one of {{ dns_sites }}
+      (or a nested child group) to derive its subdomain; found: {{ site_matches }}.
+      Fix inventory group membership, or pass -e subdomain=<value> explicitly.
+  when: subdomain is not defined
+
+- name: Derive subdomain from site group membership
+  set_fact:
+    subdomain: "{{ site_matches[0] }}.{{ dns_domain_suffix }}"
+  when: subdomain is not defined

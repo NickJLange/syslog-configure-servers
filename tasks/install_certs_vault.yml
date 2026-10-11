@@ -1,7 +1,7 @@
 ---
-- name: Set Fact
-  set_fact:
-    subdomain: "{{ inventory_hostname.split('.')[1:] | join('.') }}"
+- name: Derive subdomain
+  include_tasks: derive_subdomain.yml
+
 - name: Debug
   debug:
     msg: "Rotating certs for {{ subdomain }} into vault"

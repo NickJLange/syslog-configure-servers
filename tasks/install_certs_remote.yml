@@ -1,18 +1,7 @@
 ---
-- name: "Install pip via apt"
-  ansible.builtin.apt:
-    name: python3-hvac
-    state: present
-  become: true
-  ignore_errors: true
+- name: Derive subdomain
+  include_tasks: derive_subdomain.yml
 
-- name: "Install hvac within a home directory (instead of venv madness...)"
-  ansible.builtin.pip:
-    name: hvac
-    extra_args: --user
-    virtualenv: venv
-    virtualenv_python: python3.12
-  ignore_errors: true
 - name: Debug
   debug:
     msg: "Rotating certs for {{ subdomain }}"
@@ -27,9 +16,10 @@
     username: "{{ vault_cert_user }}"
     password: "{{ vault_cert_password }}"
   register: vault_secret
-#  delegate_to: localhost
-#  vars:
-#    ansible_python_interpreter: "{{ ansible_python_interpreter }}"
+  delegate_to: localhost
+  become: false
+  vars:
+    ansible_python_interpreter: "{{ cert_mgmt_venv_path }}/bin/python3"
 - block:
     - name: Check directory exists
       file:
