@@ -84,6 +84,5 @@
         - "{{ subdomain }}.key"
         #      - "unifi-core-direct.key"
 
-  # cert_owner (certpush, see mkrasberry roles/cert-setup) owns ssl_cert_dir,
-  # so the push needs no sudo.
-  become: false
+  # Inherit the caller's privilege settings: administrative installers can
+  # become cert_owner, while renewal jobs connect directly as cert_owner.
